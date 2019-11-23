@@ -12,21 +12,19 @@ public class Spatial : Godot.Spatial
 	{
 		VisualServer.SetDefaultClearColor(Color.Color8(0, 0, 0, 255));
 
-		Camera camera = new Camera()
+		AddChild(new Camera()
 		{
 			Current = true,
-		};
-		AddChild(camera);
+		});
 
-		WorldEnvironment worldEnvironment = new WorldEnvironment()
+		AddChild(new WorldEnvironment()
 		{
 			Environment = new Godot.Environment()
 			{
 				BackgroundColor = Color.Color8(85, 85, 85, 255),
 				BackgroundMode = Godot.Environment.BGMode.Color,
 			},
-		};
-		AddChild(worldEnvironment);
+		});
 
 		Viewport viewport = new Viewport()
 		{
@@ -61,14 +59,12 @@ public class Spatial : Godot.Spatial
 
 		BitmapFont font = new BitmapFont();
 		font.CreateFromFnt("Bm437_IBM_VGA9.fnt");
-		Theme theme = new Theme()
-		{
-			DefaultFont = font,
-		};
-
 		Label label = new Label()
 		{
-			Theme = theme,
+			Theme = new Theme()
+			{
+				DefaultFont = font,
+			},
 			RectPosition = new Vector2(0, 0),
 		};
 		label.Set("custom_constants/line_spacing", 0);
