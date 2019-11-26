@@ -35,8 +35,60 @@ public class VirtualScreenText
         }
     }
 
+    private Godot.ColorRect cursor;
+    public Godot.ColorRect Cursor
+    {
+        get { return cursor; }
+        set
+        {
+            cursor = value;
+            if (cursor != null)
+                SetCursor();
+        }
+    }
+
+    public VirtualScreenText SetCursor()
+    {
+        uint x = (uint)(lines.Count == 0 ? 0 : lines.Last().Length > 79 ? 0 : lines.Last().Length);
+        return SetCursor(x, (uint)(lines.Count - (lines.Count > 0 ? 1 : 0)));
+    }
+
+    public VirtualScreenText SetCursor(uint x, uint y)
+    {
+        if (Cursor != null)
+            Cursor.RectGlobalPosition = new Godot.Vector2(x * 9, y * 16 + 14);
+        return this;
+    }
+
     public uint Height { get; set; } = 25;
     public uint Width { get; set; } = 80;
+
+    public TimeSpan BlinkRate { get; set; } = TimeSpan.FromSeconds(0.25d);
+    private DateTime LastBlink = DateTime.Now;
+
+    public bool ShowCursor
+    {
+        get
+        {
+            return Cursor == null ? false : Cursor.Visible;
+        }
+        set
+        {
+            if (Cursor != null)
+                Cursor.Visible = value;
+        }
+    }
+
+    public VirtualScreenText UpdateCursor()
+    {
+        DateTime now = DateTime.Now;
+        if (Cursor != null && now - LastBlink >= BlinkRate)
+        {
+            LastBlink = now;
+            ShowCursor = !ShowCursor;
+        }
+        return this;
+    }
 
     public override string ToString()
     {
@@ -58,6 +110,7 @@ public class VirtualScreenText
                 lines.Dequeue();
         if (Label != null)
             Label.Text = Text;
+        SetCursor();
         return this;
     }
 
