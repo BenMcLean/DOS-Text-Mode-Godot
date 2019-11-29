@@ -66,8 +66,8 @@ public class DosScreen : Godot.Spatial
         public uint Height { get; set; } = 25;
         public uint Width { get; set; } = 80;
 
-        public TimeSpan BlinkRate { get; set; } = TimeSpan.FromSeconds(0.25d);
-        private DateTime LastBlink = DateTime.Now;
+        public float BlinkRate { get; set; } = 0.25f;
+        private float Blink { get; set; } = 0f;
 
         public bool ShowCursor
         {
@@ -82,12 +82,12 @@ public class DosScreen : Godot.Spatial
             }
         }
 
-        public VirtualScreenText UpdateCursor()
+        public VirtualScreenText UpdateCursor(float delta)
         {
-            DateTime now = DateTime.Now;
-            if (Cursor != null && now - LastBlink >= BlinkRate)
+            Blink += delta;
+            while (Blink > BlinkRate)
             {
-                LastBlink = now;
+                Blink -= BlinkRate;
                 ShowCursor = !ShowCursor;
             }
             return this;
@@ -208,8 +208,8 @@ public class DosScreen : Godot.Spatial
     public override void _Process(float delta)
     {
         base._Process(delta);
+        Screen.UpdateCursor(delta);
         if (Sprite3D.Visible)
             Rotation = new Vector3(0f, GetViewport().GetCamera().GlobalTransform.basis.GetEuler().y, 0f);
-        Screen.UpdateCursor();
     }
 }
